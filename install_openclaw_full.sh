@@ -3,7 +3,7 @@
 set -e
 
 echo "=================================="
-echo " OPENCLAW FULL INSTALLER v2"
+echo " OPENCLAW FULL INSTALLER v3"
 echo " TERMUX + DEBIAN PROOT"
 echo "=================================="
 
@@ -16,7 +16,7 @@ proot-distro install debian || true
 
 echo "[3/7] Configurando Debian..."
 
-proot-distro login debian -- bash -c '
+proot-distro login debian -- bash <<'DEBIAN_SCRIPT'
 
 set -e
 
@@ -43,7 +43,7 @@ fi
 echo "Arquitectura detectada: $NODE_ARCH"
 
 echo "[5/7] Obteniendo última versión estable de Node v25..."
-NODE_VERSION=$(curl -s https://nodejs.org/dist/index.json | jq -r "[.[] | select(.version | startswith(\"v25.\"))][0].version")
+NODE_VERSION=$(curl -s https://nodejs.org/dist/index.json | jq -r '[.[] | select(.version | startswith("v25."))][0].version')
 
 if [ -z "$NODE_VERSION" ] || [ "$NODE_VERSION" = "null" ]; then
     echo "No se pudo obtener versión de Node v25"
@@ -54,8 +54,6 @@ echo "Descargando Node $NODE_VERSION..."
 
 NODE_FILE="node-$NODE_VERSION-$NODE_ARCH.tar.xz"
 NODE_URL="https://nodejs.org/dist/$NODE_VERSION/$NODE_FILE"
-
-echo "URL: $NODE_URL"
 
 curl -f -O $NODE_URL
 
@@ -70,7 +68,7 @@ rm $NODE_FILE
 
 mv node-$NODE_VERSION-$NODE_ARCH node
 
-echo "export PATH=/root/node/bin:\$PATH" >> /root/.bashrc
+echo 'export PATH=/root/node/bin:$PATH' >> /root/.bashrc
 export PATH=/root/node/bin:$PATH
 
 echo "Verificando Node..."
@@ -84,28 +82,35 @@ OPENCLAW_PATH=$(npm root -g)
 
 echo "[7/7] Aplicando parche networkInterfaces..."
 
-node -e "
-const fs=require('fs');
-const os=require('os');
+cat > /root/gen_ni.js <<EOF
+const fs = require('fs');
+const os = require('os');
 fs.writeFileSync('/root/ni.json', JSON.stringify(os.networkInterfaces(), null, 2));
-"
+EOF
+
+node /root/gen_ni.js
+rm /root/gen_ni.js
 
 find $OPENCLAW_PATH -type f -name "*.js" -exec sed -i \
-"s/os.networkInterfaces()/JSON.parse(require(\"fs\").readFileSync(\"\\/root\\/ni.json\"))/g" {} +
+'s/os\.networkInterfaces()/JSON.parse(require("fs").readFileSync("\/root\/ni.json"))/g' {} +
 
-echo "Parche aplicado."
+echo "Parche aplicado correctamente."
 
 echo "Configurando override xdg-open..."
 mv /usr/bin/xdg-open /usr/bin/xdg-open.bak 2>/dev/null || true
-echo -e "#!/bin/sh\necho \$@ > /root/auth_url.txt" > /usr/bin/xdg-open
+cat > /usr/bin/xdg-open <<EOF
+#!/bin/sh
+echo \$@ > /root/auth_url.txt
+EOF
 chmod +x /usr/bin/xdg-open
 
 echo "Creando alias útiles..."
-echo "alias openclaw-start=\"node \$(which openclaw) gateway\"" >> /root/.bashrc
-echo "alias openclaw-onboard=\"node \$(which openclaw) onboard\"" >> /root/.bashrc
+echo 'alias openclaw-start="node $(which openclaw) gateway"' >> /root/.bashrc
+echo 'alias openclaw-onboard="node $(which openclaw) onboard"' >> /root/.bashrc
 
 echo "Instalación completada dentro de Debian."
-'
+
+DEBIAN_SCRIPT
 
 echo ""
 echo "=================================="

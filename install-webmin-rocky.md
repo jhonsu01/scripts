@@ -35,7 +35,32 @@ echo "theme=authentic-theme" >> /etc/webmin/config
 echo "preroot=authentic-theme" >> /etc/webmin/miniserv.conf
 ```
 
-# 4. Reiniciar
+# 4. Instalar módulo de procesos
+```bash
+dnf install -y perl-Proc-ProcessTable 2>/dev/null || true
+```
+# 5. Crear config del módulo system-status para evitar el error del dashboard
+```bash
+mkdir -p /etc/webmin/system-status
+```
+```bash
+cat > /etc/webmin/system-status/config <<'EOF'
+collect_interval=none
+no_collect=1
+collect_cron=0
+EOF
+```
+# 6. Crear config del módulo proc
+```bash
+mkdir -p /etc/webmin/proc
+```
+```bash
+cat > /etc/webmin/proc/config <<'EOF'
+listing_type=1
+EOF
+```
+
+# 7. Reiniciar
 ```bash
 webmin-restart
 ```

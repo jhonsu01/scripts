@@ -31,7 +31,7 @@ echo ""
 
 echo ""
 echo -e "${BOLD}━━━ Paso 1/4: Instalando dependencias ━━━${NC}"
-dnf install -y perl perl-Net-SSLeay perl-Encode-Detect perl-Data-Dumper wget tar openssl
+dnf install -y perl perl-Net-SSLeay perl-Data-Dumper wget tar openssl
 echo -e "${GREEN}[✓]${NC} Dependencias instaladas"
 
 echo ""

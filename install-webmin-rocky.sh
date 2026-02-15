@@ -26,18 +26,8 @@ echo -e "${CYAN}[i]${NC} Configuración de acceso a Webmin"
 echo ""
 read -p "Usuario admin: " WEBMIN_USER
 WEBMIN_USER=${WEBMIN_USER:-admin}
-
-while true; do
-    read -s -p "Contraseña: " WEBMIN_PASS
-    echo ""
-    read -s -p "Confirmar contraseña: " WEBMIN_PASS2
-    echo ""
-    if [ "$WEBMIN_PASS" = "$WEBMIN_PASS2" ]; then
-        break
-    else
-        echo -e "${YELLOW}[!]${NC} Las contraseñas no coinciden. Intenta de nuevo."
-    fi
-done
+read -s -p "Contraseña: " WEBMIN_PASS
+echo ""
 
 echo ""
 echo -e "${BOLD}━━━ Paso 1/4: Instalando dependencias ━━━${NC}"

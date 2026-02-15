@@ -43,6 +43,7 @@ echo -e "${GREEN}[✓]${NC} Descarga completada"
 
 echo ""
 echo -e "${BOLD}━━━ Paso 3/4: Instalando Webmin ━━━${NC}"
+mkdir -p /usr/local
 rm -rf /usr/local/webmin 2>/dev/null
 tar xzf webmin-2.111-minimal.tar.gz
 mv webmin-2.111 /usr/local/webmin

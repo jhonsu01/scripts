@@ -64,3 +64,30 @@ EOF
 ```bash
 webmin-restart
 ```
+
+# 8. SSH
+```bash
+dnf install -y openssh-server openssh-clients
+```
+```bash
+ssh-keygen -A
+```
+
+```bash
+mkdir -p /etc/ssh
+```
+```bash
+ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key -N ""
+```
+```bash
+ssh-keygen -t ecdsa -f /etc/ssh/ssh_host_ecdsa_key -N ""
+```
+```bash
+ssh-keygen -t ed25519 -f /etc/ssh/ssh_host_ed25519_key -N ""
+```
+
+# Iniciar
+```bash
+/usr/sbin/sshd
+```
+
